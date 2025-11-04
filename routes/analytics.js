@@ -22,6 +22,16 @@ router.post('/', async (req, res) => {
     }
 });
 
+router.get('/all', async (req, res) => {
+    try {
+        const allEvents = await Analytics.find({}).sort({ timestamp: -1 });
+        res.json(allEvents);
+    } catch (error) {
+        console.error('Analytics GET ALL failed:', error.message);
+        res.status(500).json({ success: false, message: 'Internal Server Error' });
+    }
+});
+
 router.get('/summary', async (req, res) => {
     try {
         const mostScannedPaintings = await Analytics.aggregate([
