@@ -32,6 +32,27 @@ router.get('/all', async (req, res) => {
     }
 });
 
+// In routes/analytics.js
+
+router.get('/scans-by-painting', async (req, res) => {
+    try {
+        const result = await Analytics.aggregate([
+            { $match: { eventType: 'scan_success' } },
+            { $group: { 
+                _id: "$paintingTitle", 
+                count: { $sum: 1 },
+                artist: { $first: "$paintingArtist" },
+                paintingId: { $first: "$paintingId" }
+            }},
+            { $sort: { count: -1 } }
+        ]);
+        res.json(result);
+    } catch (error) {
+        res.status(500).json({ success: false, message: error.message });
+    }
+});
+
+
 router.get('/summary', async (req, res) => {
     try {
         const mostScannedPaintings = await Analytics.aggregate([
